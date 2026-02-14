@@ -1,0 +1,44 @@
+{
+  "nav": {
+    "about": "Sobre",
+    "skills": "Tecnologias",
+    "projects": "Projetos",
+    "contact": "Contato"
+  },
+  "hero": {
+    "title": "Gabriel",
+    "description": "Construindo aplicações escaláveis com Go e React. Atualmente na Napp Solutions, aprofundando conhecimentos em design de sistemas e arquitetura backend.",
+    "viewWork": "Ver Projetos",
+    "getInTouch": "Entrar em contato"
+  },
+  "skills": {
+    "title": "Tecnologias"
+  },
+  "projects": {
+    "title": "Projeto em Destaque",
+    "projectName": "Editor de Markdown",
+    "stack": "React • TypeScript • Electron • Vite",
+    "description": "Um editor de markdown pessoal construído para uso diário. Preview ao vivo, explorador de arquivos, palette de comandos e integração com Claude Assist.",
+    "features": {
+      "0": "Preview de markdown ao vivo com split view",
+      "1": "CodeMirror 6 com syntax highlighting",
+      "2": "Explorador de arquivos com árvore de diretórios",
+      "3": "Integração com Claude Assist"
+    },
+    "repository": "Repositório",
+    "learnMore": "Saiba mais"
+  },
+  "contact": {
+    "title": "Vamos Conversar",
+    "description": "Sempre interessado em ouvir sobre novas oportunidades e colaborações.",
+    "sendEmail": "Enviar Email"
+  },
+  "footer": {
+    "copyright": "© 2026 Gabriel Dias • Full Stack Developer"
+  },
+  "language": {
+    "name": "PORTUGUÊS",
+    "en-US": "ENGLISH",
+    "pt-BR": "PORTUGUÊS"
+  }
+}
