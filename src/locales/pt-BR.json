@@ -7,15 +7,20 @@
   },
   "hero": {
     "title": "Gabriel",
-    "description": "Construindo aplicações escaláveis com Go e React. Atualmente na Napp Solutions, aprofundando conhecimentos em design de sistemas e arquitetura backend.",
+    "available": "Disponível para novos projetos",
+    "headline1": "Construindo o futuro com",
+    "headline2": "código escalável",
+    "description": "Olá, eu sou o <strong>Gabriel</strong>. Atualmente na Napp Solutions, foco em design de sistemas e arquitetura backend, especializando-me em ecossistemas Go e React.",
     "viewWork": "Ver Projetos",
     "getInTouch": "Entrar em contato"
   },
   "skills": {
-    "title": "Tecnologias"
+    "title": "Stack de Tecnologias",
+    "subtitle": "Ferramentas e linguagens que utilizo para transformar ideias em produtos digitais escaláveis."
   },
   "projects": {
-    "title": "Projetos em desenvolvimento",
+    "title": "Projetos em Destaque",
+    "subtitle": "Uma seleção de trabalhos recentes focados em performance e experiência do usuário.",
     "markdown-editor": {
       "name": "Editor de Markdown",
       "stack": "React • TypeScript • Electron • Vite",
@@ -30,7 +35,7 @@
     "db-query-app": {
       "name": "DB Query App",
       "stack": "React • TypeScript • Electron • PostgreSQL • SQLite",
-      "description": "Aplicação desktop para editar e executar queries SQL com assistência de IA. Suporta PostgreSQL e SQLite com geração inteligente de queries via prompts em linguagem natural.",
+      "description": "Aplicação desktop robusta para edição e execução de queries SQL com assistência de IA integrada.",
       "features": {
         "0": "Geração de queries SQL via IA a partir de prompts",
         "1": "Editor SQL com syntax highlighting",
@@ -52,12 +57,24 @@
     "learnMore": "Saiba mais"
   },
   "contact": {
-    "title": "Vamos Conversar",
-    "description": "Sempre interessado em ouvir sobre novas oportunidades e colaborações.",
+    "title": "Vamos construir algo",
+    "titleHighlight": "extraordinário",
+    "titleEnd": "juntos?",
+    "description": "Estou sempre aberto a novas oportunidades, colaborações em projetos open source ou apenas para um café virtual.",
+    "emailLabel": "E-mail",
+    "namePlaceholder": "Seu nome",
+    "emailPlaceholder": "seu@email.com",
+    "messagePlaceholder": "Como posso ajudar?",
+    "nameLabel": "Nome",
+    "messageLabel": "Mensagem",
+    "sendMessage": "Enviar Mensagem",
     "sendEmail": "Enviar Email"
   },
   "footer": {
-    "copyright": "© 2026 Gabriel Dias • Full Stack Developer"
+    "copyright": "© 2026 Gabriel Dias. Todos os direitos reservados.",
+    "twitter": "Twitter",
+    "github": "GitHub",
+    "linkedin": "LinkedIn"
   },
   "language": {
     "name": "PORTUGUÊS",

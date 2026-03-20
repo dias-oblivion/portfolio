@@ -1,5 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { Github, Linkedin, Mail, ExternalLink, ArrowRight, Code, Database, BoxesIcon, Cloud, Coffee, Server, Layers, Globe, ChevronLeft, ChevronRight, X, Maximize, Minimize } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import {
+  Github, Linkedin, Mail, ArrowRight,
+  Terminal, Database, Layout, Cloud, Server, Menu, X, ChevronRight,
+  ChevronLeft, Maximize, Minimize
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import i18n from './i18n';
 import { PROJECTS } from './data/projects';
@@ -13,10 +18,272 @@ const projectImages: Record<string, string> = {
   'focus-guard': screenshotFocusGuard
 };
 
-type LightboxImage = { src: string; alt: string };
+// ── Navbar ────────────────────────────────────────────────────────────────────
+
+const Navbar = () => {
+  const { t } = useTranslation();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToSection = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setIsMobileMenuOpen(false);
+  };
+
+  const navLinks = [
+    { name: t('nav.about'), id: 'sobre' },
+    { name: t('nav.skills'), id: 'tecnologias' },
+    { name: t('nav.projects'), id: 'projetos' },
+    { name: t('nav.contact'), id: 'contato' },
+  ];
+
+  return (
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'glass py-3 shadow-sm' : 'bg-transparent py-5'}`}>
+      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+        {/* Logo */}
+        <motion.button
+          onClick={() => scrollToSection('sobre')}
+          className="font-display font-bold text-xl tracking-tight flex items-center gap-2 cursor-pointer"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+        >
+          <span className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white text-sm font-bold">G</span>
+          <span>Gabriel<span className="text-brand-600">.</span></span>
+        </motion.button>
+
+        {/* Desktop Nav */}
+        <div className="hidden md:flex items-center gap-8">
+          {navLinks.map((link, i) => (
+            <motion.button
+              key={link.id}
+              onClick={() => scrollToSection(link.id)}
+              className="text-sm font-medium text-zinc-600 hover:text-brand-600 transition-colors cursor-pointer"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08 }}
+            >
+              {link.name}
+            </motion.button>
+          ))}
+          <motion.button
+            onClick={() => {
+              const newLang = i18n.language === 'en-US' ? 'pt-BR' : 'en-US';
+              i18n.changeLanguage(newLang);
+            }}
+            className="px-4 py-2 bg-zinc-900 text-white text-xs font-bold rounded-full hover:bg-zinc-700 transition-colors cursor-pointer"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            {i18n.language === 'en-US' ? 'EN-US' : 'PT-BR'}
+          </motion.button>
+        </div>
+
+        {/* Mobile Toggle */}
+        <button
+          className="md:hidden text-zinc-900 cursor-pointer"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden glass border-t border-zinc-100 overflow-hidden"
+          >
+            <div className="flex flex-col p-6 gap-4">
+              {navLinks.map((link) => (
+                <button
+                  key={link.id}
+                  onClick={() => scrollToSection(link.id)}
+                  className="text-lg font-medium text-zinc-900 text-left cursor-pointer"
+                >
+                  {link.name}
+                </button>
+              ))}
+              <button
+                onClick={() => {
+                  const newLang = i18n.language === 'en-US' ? 'pt-BR' : 'en-US';
+                  i18n.changeLanguage(newLang);
+                }}
+                className="w-fit px-4 py-2 bg-zinc-900 text-white text-xs font-bold rounded-full cursor-pointer"
+              >
+                {i18n.language === 'en-US' ? 'EN-US' : 'PT-BR'}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </nav>
+  );
+};
+
+// ── Hero ──────────────────────────────────────────────────────────────────────
+
+const Hero = () => {
+  const { t } = useTranslation();
+
+  const scrollToSection = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  return (
+    <section id="sobre" className="relative pt-28 pb-20 overflow-hidden">
+      {/* Background blobs */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-brand-200/30 rounded-full blur-3xl" />
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-indigo-200/20 rounded-full blur-3xl" />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 relative">
+        <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
+
+          {/* Left: Text */}
+          <motion.div
+            className="flex-1 text-center md:text-left"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            {/* Available badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-50 border border-brand-100 text-brand-700 text-xs font-semibold mb-6">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500" />
+              </span>
+              {t('hero.available')}
+            </div>
+
+            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 leading-[1.1]">
+              {t('hero.headline1')}{' '}
+              <span className="text-gradient">{t('hero.headline2')}</span>.
+            </h1>
+
+            <p className="text-lg text-zinc-600 mb-10 max-w-xl leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: t('hero.description') }}
+            />
+
+            <div className="flex flex-wrap justify-center md:justify-start gap-4">
+              <button
+                onClick={() => scrollToSection('projetos')}
+                className="group px-8 py-4 bg-zinc-900 text-white font-medium rounded-xl hover:bg-zinc-800 transition-all flex items-center gap-2 shadow-lg shadow-zinc-200 cursor-pointer"
+              >
+                {t('hero.viewWork')}
+                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+              <button
+                onClick={() => scrollToSection('contato')}
+                className="px-8 py-4 bg-white text-zinc-900 font-medium rounded-xl border border-zinc-200 hover:bg-zinc-50 transition-all cursor-pointer"
+              >
+                {t('hero.getInTouch')}
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Right: Image */}
+          <motion.div
+            className="relative shrink-0"
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <div className="w-64 h-64 md:w-80 md:h-80 rounded-3xl overflow-hidden border-8 border-white shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-500">
+              <img
+                src="https://avatars.githubusercontent.com/u/141333557?v=4"
+                alt="Gabriel"
+                className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+
+            {/* Floating badge */}
+            <div className="absolute -bottom-5 -left-6 glass p-4 rounded-2xl shadow-xl hidden md:block">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600">
+                  <Terminal size={20} />
+                </div>
+                <div>
+                  <div className="text-xs text-zinc-500 font-medium">Backend Expert</div>
+                  <div className="text-sm font-bold">Go &amp; Node.js</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ── Tech Stack ────────────────────────────────────────────────────────────────
+
+type SkillCategory = 'frontend' | 'backend' | 'database' | 'devops';
+
+const SKILLS: { name: string; icon: React.ReactNode; category: SkillCategory; color: string }[] = [
+  { name: 'React',       icon: <Layout size={24} />,   category: 'frontend',  color: 'text-sky-500' },
+  { name: 'TypeScript',  icon: <Terminal size={24} />,  category: 'frontend',  color: 'text-blue-600' },
+  { name: 'Go',          icon: <Terminal size={24} />,  category: 'backend',   color: 'text-cyan-500' },
+  { name: 'Node.js',     icon: <Server size={24} />,    category: 'backend',   color: 'text-green-600' },
+  { name: 'Java Spring', icon: <Terminal size={24} />,  category: 'backend',   color: 'text-orange-600' },
+  { name: 'Python',      icon: <Terminal size={24} />,  category: 'backend',   color: 'text-yellow-600' },
+  { name: 'PostgreSQL',  icon: <Database size={24} />,  category: 'database',  color: 'text-indigo-600' },
+  { name: 'Docker',      icon: <Cloud size={24} />,     category: 'devops',    color: 'text-blue-500' },
+  { name: 'AWS',         icon: <Cloud size={24} />,     category: 'devops',    color: 'text-orange-500' },
+];
+
+import React from 'react';
+
+const TechStack = () => {
+  const { t } = useTranslation();
+
+  return (
+    <section id="tecnologias" className="py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">{t('skills.title')}</h2>
+          <p className="text-zinc-500 max-w-xl mx-auto">{t('skills.subtitle')}</p>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          {SKILLS.map((skill, i) => (
+            <motion.div
+              key={skill.name}
+              className="p-6 rounded-2xl border border-zinc-100 bg-zinc-50/50 hover:bg-white hover:shadow-xl hover:shadow-zinc-100 transition-all group cursor-default"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05 }}
+            >
+              <div className={`mb-4 transition-transform group-hover:scale-110 duration-300 ${skill.color}`}>
+                {skill.icon}
+              </div>
+              <h3 className="font-semibold text-zinc-900 text-sm">{skill.name}</h3>
+              <p className="text-xs text-zinc-400 mt-1 uppercase tracking-wider font-medium">{skill.category}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ── Image Lightbox ────────────────────────────────────────────────────────────
 
 type LightboxProps = {
-  images: LightboxImage[];
+  images: { src: string; alt: string }[];
   initialIndex: number;
   onClose: () => void;
 };
@@ -50,11 +317,8 @@ const ImageLightbox = ({ images, initialIndex, onClose }: LightboxProps) => {
   }, []);
 
   const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      containerRef.current?.requestFullscreen();
-    } else {
-      document.exitFullscreen();
-    }
+    if (!document.fullscreenElement) containerRef.current?.requestFullscreen();
+    else document.exitFullscreen();
   };
 
   const { src, alt } = images[index];
@@ -65,23 +329,20 @@ const ImageLightbox = ({ images, initialIndex, onClose }: LightboxProps) => {
       style={{ backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(6px)' }}
       onClick={onClose}
     >
-      {/* Prev button — outside modal */}
       <button
         onClick={(e) => { e.stopPropagation(); prev(); }}
         className="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer mx-4"
-        aria-label="Projeto anterior"
+        aria-label="Anterior"
       >
         <ChevronLeft className="w-5 h-5" />
       </button>
 
-      {/* Modal container */}
       <div
         ref={containerRef}
-        className="relative flex flex-col flex-1 max-w-5xl max-h-[90vh] bg-gray-950 rounded-2xl overflow-hidden shadow-2xl"
+        className="relative flex flex-col flex-1 max-w-5xl max-h-[90vh] bg-zinc-950 rounded-2xl overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
         style={{ animation: 'lightbox-in 180ms ease-out' }}
       >
-        {/* Top bar */}
         <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
           <span className="text-sm font-medium text-white/70 truncate">{alt}</span>
           <div className="flex items-center gap-2 flex-shrink-0">
@@ -89,22 +350,19 @@ const ImageLightbox = ({ images, initialIndex, onClose }: LightboxProps) => {
             <button
               onClick={toggleFullscreen}
               className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-              title={isFullscreen ? 'Sair do fullscreen' : 'Fullscreen'}
             >
               {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
             </button>
             <button
               onClick={onClose}
               className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-              title="Fechar"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Image area */}
-        <div className="flex items-center justify-center p-4 md:p-8 bg-gray-950">
+        <div className="flex items-center justify-center p-4 md:p-8 bg-zinc-950">
           <img
             key={src}
             src={src}
@@ -115,24 +373,22 @@ const ImageLightbox = ({ images, initialIndex, onClose }: LightboxProps) => {
           />
         </div>
 
-        {/* Dots */}
         <div className="flex justify-center gap-1.5 py-3">
           {images.map((_, i) => (
             <button
               key={i}
               onClick={() => setIndex(i)}
               className={`h-1.5 rounded-full transition-all cursor-pointer ${i === index ? 'bg-white w-5' : 'bg-white/30 w-1.5 hover:bg-white/50'}`}
-              aria-label={`Ver imagem ${i + 1}`}
+              aria-label={`Imagem ${i + 1}`}
             />
           ))}
         </div>
       </div>
 
-      {/* Next button — outside modal */}
       <button
         onClick={(e) => { e.stopPropagation(); next(); }}
         className="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer mx-4"
-        aria-label="Próximo projeto"
+        aria-label="Próximo"
       >
         <ChevronRight className="w-5 h-5" />
       </button>
@@ -147,323 +403,210 @@ const ImageLightbox = ({ images, initialIndex, onClose }: LightboxProps) => {
   );
 };
 
-const Portfolio = () => {
+// ── Projects ──────────────────────────────────────────────────────────────────
+
+const Projects = () => {
   const { t } = useTranslation();
-  const [isVisible, setIsVisible] = useState(false);
-  const [activeProject, setActiveProject] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-  const prevProject = () => setActiveProject((p) => (p - 1 + PROJECTS.length) % PROJECTS.length);
-  const nextProject = () => setActiveProject((p) => (p + 1) % PROJECTS.length);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') setActiveProject((p) => (p - 1 + PROJECTS.length) % PROJECTS.length);
-      if (e.key === 'ArrowRight') setActiveProject((p) => (p + 1) % PROJECTS.length);
-    };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, []);
-
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
-  const skills = [
-    { name: 'React', color: 'bg-blue-50 text-blue-700', Icon: Code },
-    { name: 'TypeScript', color: 'bg-blue-50 text-blue-700', Icon: Code },
-    { name: 'Go', color: 'bg-cyan-50 text-cyan-700', Icon: Layers },
-    { name: 'Java Spring', color: 'bg-orange-50 text-orange-700', Icon: Coffee },
-    { name: 'Python', color: 'bg-amber-50 text-amber-700', Icon: Code },
-    { name: 'Node.js', color: 'bg-green-50 text-green-700', Icon: Server },
-    { name: 'PostgreSQL', color: 'bg-slate-50 text-slate-700', Icon: Database },
-    { name: 'Docker', color: 'bg-sky-50 text-sky-700', Icon: BoxesIcon },
-    { name: 'AWS', color: 'bg-orange-50 text-orange-700', Icon: Cloud }
-  ];
-
-  const socialLinks = [
-    { icon: Github, label: 'GitHub', url: 'https://github.com/dias-oblivion' },
-    { icon: Linkedin, label: 'LinkedIn', url: 'https://www.linkedin.com/in/gabriel-dias-dev/' },
-    { icon: Mail, label: 'Email', url: 'mailto:gabrieldias335@gmail.com' }
-  ];
+  const lightboxImages = PROJECTS.map((p) => ({
+    src: projectImages[p.id],
+    alt: t(`projects.${p.id}.name`),
+  }));
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans">
-      {/* Navigation */}
-      <nav className="border-b border-gray-200 sticky top-0 bg-white/95 backdrop-blur-sm z-40">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center gap-6">
-          {/* Nav Links - Center */}
-          <div className="flex-1 flex justify-center gap-12">
-            {[
-              { name: t('nav.about'), id: 'about' },
-              { name: t('nav.skills'), id: 'skills' },
-              { name: t('nav.projects'), id: 'projects' },
-              { name: t('nav.contact'), id: 'contact' }
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollToSection(item.id)}
-                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
-              >
-                {item.name}
-              </button>
-            ))}
+    <section id="projetos" className="py-24">
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+          <div>
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">{t('projects.title')}</h2>
+            <p className="text-zinc-500 max-w-xl">{t('projects.subtitle')}</p>
           </div>
-
-          {/* Language Toggle - Right */}
-          <button
-            onClick={() => {
-              const newLang = i18n.language === 'en-US' ? 'pt-BR' : 'en-US';
-              i18n.changeLanguage(newLang);
-            }}
-            className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all text-xs font-medium text-gray-700 cursor-pointer whitespace-nowrap"
-            title="Toggle language"
-          >
-            <Globe className="w-4 h-4" />
-            <span>{i18n.language === 'en-US' ? 'EN-US' : 'PT-BR'}</span>
-          </button>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section id="about" className="py-32 px-6">
-        <div className="max-w-3xl mx-auto">
-          <div className={`transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            <div className="flex items-center gap-6 mb-8">
-              <img 
-                src="https://avatars.githubusercontent.com/u/141333557?v=4" 
-                alt="Gabriel Avatar"
-                className="w-16 h-16 rounded-full ring-2 ring-gray-200 shadow-md flex-shrink-0"
-              />
-              <h1 className="text-5xl md:text-6xl font-bold">
-                {t('hero.title')}
-              </h1>
-            </div>
-            <p className="text-lg text-gray-600 leading-relaxed mb-10">
-              {t('hero.description')}
-            </p>
-            <div className="flex gap-6">
-              <button 
-                onClick={() => scrollToSection('projects')}
-                className="flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded transition-all hover:bg-gray-700 cursor-pointer font-medium"
-              >
-                {t('hero.viewWork')}
-                <ArrowRight className="w-4 h-4" />
-              </button>
-              <a 
-                href="mailto:gabrieldias335@gmail.com"
-                className="flex items-center gap-2 border border-gray-300 text-gray-900 px-6 py-3 rounded hover:bg-gray-50 transition-all cursor-pointer font-medium"
-              >
-                {t('hero.getInTouch')}
-              </a>
-            </div>
+          <div className="flex gap-2 shrink-0">
+            <button className="w-10 h-10 rounded-full border border-zinc-200 flex items-center justify-center hover:bg-zinc-900 hover:text-white hover:border-zinc-900 transition-all cursor-pointer">
+              <ChevronRight size={20} className="rotate-180" />
+            </button>
+            <button className="w-10 h-10 rounded-full border border-zinc-200 flex items-center justify-center hover:bg-zinc-900 hover:text-white hover:border-zinc-900 transition-all cursor-pointer">
+              <ChevronRight size={20} />
+            </button>
           </div>
         </div>
-      </section>
 
-      {/* Projects Section */}
-      <section id="projects" className="py-24 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-center justify-between mb-12">
-            <h2 className="text-2xl font-bold">{t('projects.title')}</h2>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={prevProject}
-                className="w-9 h-9 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
-                aria-label="Previous project"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <span className="text-sm text-gray-500 font-medium tabular-nums">
-                {activeProject + 1} / {PROJECTS.length}
-              </span>
-              <button
-                onClick={nextProject}
-                className="w-9 h-9 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
-                aria-label="Next project"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Carousel */}
-          <div className="relative overflow-hidden">
-            <div
-              className="flex transition-transform duration-500 ease-in-out"
-              style={{ transform: `translateX(-${activeProject * 100}%)` }}
+        {/* Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {PROJECTS.map((project, i) => (
+            <motion.div
+              key={project.id}
+              className="group"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.15 }}
             >
-              {PROJECTS.map((project) => (
-                <div key={project.id} className="w-full flex-shrink-0">
-                  <div className="grid md:grid-cols-2 gap-12 items-start">
-
-                    {/* Project Screenshot */}
-                    <button
-                      className="group relative bg-gray-900 border border-gray-200 rounded-xl overflow-hidden aspect-video flex items-center justify-center cursor-zoom-in w-full text-left"
-                      onClick={() => setLightboxIndex(PROJECTS.findIndex((p) => p.id === project.id))}
-                      aria-label={`Ver imagem de ${t(`projects.${project.id}.name`)}`}
+              {/* Image — clicável para abrir lightbox */}
+              <button
+                className="relative w-full aspect-[16/10] rounded-3xl overflow-hidden mb-8 bg-zinc-100 cursor-zoom-in text-left"
+                onClick={() => setLightboxIndex(i)}
+                aria-label={`Ver ${t(`projects.${project.id}.name`)} em detalhes`}
+              >
+                <img
+                  src={projectImages[project.id]}
+                  alt={t(`projects.${project.id}.name`)}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
+                  {project.githubUrl && (
+                    <a
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-12 h-12 rounded-full bg-white text-zinc-900 flex items-center justify-center hover:scale-110 transition-transform cursor-pointer"
+                      aria-label="GitHub"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      <img
-                        src={projectImages[project.id]}
-                        alt={t(`projects.${project.id}.name`)}
-                        className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                      {/* Hover overlay hint */}
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/20">
-                        <div className="bg-black/60 text-white text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5 backdrop-blur-sm">
-                          <Maximize className="w-3 h-3" />
-                          Ver em detalhes
-                        </div>
-                      </div>
-                    </button>
-
-                    {/* Project Info */}
-                    <div className="py-2">
-                      <h3 className="text-2xl font-bold mb-2">
-                        {t(`projects.${project.id}.name`)}
-                      </h3>
-                      <p className="text-sm text-gray-500 font-medium mb-6">
-                        {t(`projects.${project.id}.stack`)}
-                      </p>
-
-                      <p className="text-gray-700 mb-8 leading-relaxed">
-                        {t(`projects.${project.id}.description`)}
-                      </p>
-
-                      <ul className="space-y-3 mb-8 text-sm text-gray-600">
-                        {Array.from({ length: project.featureCount }, (_, idx) => (
-                          <li key={idx} className="flex items-start gap-3">
-                            <span className="text-gray-400 mt-0.5">→</span>
-                            <span>{t(`projects.${project.id}.features.${idx}`)}</span>
-                          </li>
-                        ))}
-                      </ul>
-
-                      <div className="flex gap-4">
-                        {project.githubUrl && (
-                          <a
-                            href={project.githubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-gray-900 hover:text-gray-600 font-medium cursor-pointer"
-                          >
-                            <Github className="w-4 h-4" />
-                            {t('projects.repository')}
-                          </a>
-                        )}
-                        {project.liveUrl && (
-                          <a
-                            href={project.liveUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-gray-900 hover:text-gray-600 font-medium cursor-pointer"
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                            {t('projects.learnMore')}
-                          </a>
-                        )}
-                      </div>
-                    </div>
+                      <Github size={20} />
+                    </a>
+                  )}
+                  <div className="w-12 h-12 rounded-full bg-white text-zinc-900 flex items-center justify-center hover:scale-110 transition-transform">
+                    <Maximize size={20} />
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
+              </button>
 
-          {/* Dots indicator */}
-          <div className="flex justify-center gap-2 mt-10">
-            {PROJECTS.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setActiveProject(idx)}
-                className={`w-2 h-2 rounded-full transition-all cursor-pointer ${idx === activeProject ? 'bg-gray-900 w-6' : 'bg-gray-300 hover:bg-gray-400'}`}
-                aria-label={`Go to project ${idx + 1}`}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Skills Section */}
-      <section id="skills" className="py-24 px-6 border-t border-gray-200">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold mb-12">{t('skills.title')}</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {skills.map((skill) => (
-              <div key={skill.name} className="group">
-                <div className={`${skill.color} px-4 py-4 border border-gray-200 rounded hover:shadow-md transition-all cursor-default flex items-center gap-3`}>
-                  <skill.Icon className="w-5 h-5" />
-                  <span className="font-medium">{skill.name}</span>
-                </div>
+              {/* Tech tags */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {project.tech.map((tag) => (
+                  <span key={tag} className="px-3 py-1 bg-zinc-100 text-zinc-600 text-[10px] font-bold uppercase tracking-widest rounded-full">
+                    {tag}
+                  </span>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-24 px-6 border-t border-gray-200">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl font-bold mb-6">{t('contact.title')}</h2>
-          <p className="text-lg text-gray-600 mb-16">
-            {t('contact.description')}
-          </p>
-          
-          <div className="flex justify-center gap-8 mb-16">
-            {socialLinks.map((link) => {
-              const IconComponent = link.icon;
-              return (
-                <a 
-                  key={link.label}
-                  href={link.url}
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
-                  title={link.label}
-                >
-                  <IconComponent className="w-5 h-5" />
-                  <span className="text-sm font-medium">{link.label}</span>
-                </a>
-              );
-            })}
-          </div>
-          
-          <a 
-            href="mailto:gabrieldias335@gmail.com"
-            className="inline-block bg-gray-900 text-white px-8 py-3 rounded hover:bg-gray-700 transition-all cursor-pointer font-medium"
-          >
-            {t('contact.sendEmail')}
-          </a>
-        </div>
-      </section>
+              {/* Title */}
+              <h3 className="font-display text-2xl font-bold mb-3 group-hover:text-brand-600 transition-colors">
+                {t(`projects.${project.id}.name`)}
+              </h3>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 py-8 px-6">
-        <div className="max-w-4xl mx-auto text-center text-sm text-gray-500">
-          <p>{t('footer.copyright')}</p>
-        </div>
-      </footer>
+              {/* Description */}
+              <p className="text-zinc-600 mb-6 leading-relaxed">
+                {t(`projects.${project.id}.description`)}
+              </p>
 
-      {/* Image Lightbox */}
+              {/* Features */}
+              <ul className="space-y-2">
+                {Array.from({ length: project.featureCount }, (_, idx) => (
+                  <li key={idx} className="flex items-start gap-2 text-sm text-zinc-500">
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0" />
+                    {t(`projects.${project.id}.features.${idx}`)}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
       {lightboxIndex !== null && (
         <ImageLightbox
-          images={PROJECTS.map((p) => ({ src: projectImages[p.id], alt: t(`projects.${p.id}.name`) }))}
+          images={lightboxImages}
           initialIndex={lightboxIndex}
           onClose={() => setLightboxIndex(null)}
         />
       )}
-    </div>
+    </section>
   );
 };
 
-export default Portfolio;
+// ── Contact ───────────────────────────────────────────────────────────────────
+
+const Contact = () => {
+  const { t } = useTranslation();
+
+  return (
+    <section id="contato" className="py-24 bg-zinc-900 text-white overflow-hidden relative">
+      {/* Decorative blur */}
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-brand-600/10 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+
+      <div className="max-w-3xl mx-auto px-6 relative text-center">
+        <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 leading-tight">
+          {t('contact.title')}{' '}
+          <span className="text-brand-400">{t('contact.titleHighlight')}</span>{' '}
+          {t('contact.titleEnd')}
+        </h2>
+        <p className="text-zinc-400 text-lg mb-12 leading-relaxed">
+          {t('contact.description')}
+        </p>
+
+        <a href="mailto:gabrieldias335@gmail.com" className="inline-flex items-center gap-4 group mb-10">
+          <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-brand-600 group-hover:border-brand-600 transition-all">
+            <Mail size={20} />
+          </div>
+          <div className="text-left">
+            <div className="text-xs text-zinc-500 font-medium uppercase tracking-wider">{t('contact.emailLabel')}</div>
+            <div className="text-base font-medium">gabrieldias335@gmail.com</div>
+          </div>
+        </a>
+
+        <div className="flex justify-center gap-4">
+          <a
+            href="https://github.com/dias-oblivion"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white hover:text-zinc-900 transition-all"
+            aria-label="GitHub"
+          >
+            <Github size={20} />
+          </a>
+          <a
+            href="https://www.linkedin.com/in/gabriel-dias-dev/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white hover:text-zinc-900 transition-all"
+            aria-label="LinkedIn"
+          >
+            <Linkedin size={20} />
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ── Footer ────────────────────────────────────────────────────────────────────
+
+const Footer = () => {
+  const { t } = useTranslation();
+
+  return (
+    <footer className="py-10 border-t border-zinc-100 bg-white">
+      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="text-zinc-500 text-sm">{t('footer.copyright')}</div>
+        <div className="flex gap-8">
+          <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-zinc-400 hover:text-zinc-900 transition-colors">{t('footer.twitter')}</a>
+          <a href="https://github.com/dias-oblivion" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-zinc-400 hover:text-zinc-900 transition-colors">{t('footer.github')}</a>
+          <a href="https://www.linkedin.com/in/gabriel-dias-dev/" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-zinc-400 hover:text-zinc-900 transition-colors">{t('footer.linkedin')}</a>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+// ── App ───────────────────────────────────────────────────────────────────────
+
+export default function Portfolio() {
+  return (
+    <div className="min-h-screen font-sans">
+      <Navbar />
+      <main>
+        <Hero />
+        <TechStack />
+        <Projects />
+        <Contact />
+      </main>
+      <Footer />
+    </div>
+  );
+}
