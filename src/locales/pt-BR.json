@@ -15,15 +15,38 @@
     "title": "Tecnologias"
   },
   "projects": {
-    "title": "Projeto em Destaque",
-    "projectName": "Editor de Markdown",
-    "stack": "React • TypeScript • Electron • Vite",
-    "description": "Um editor de markdown pessoal construído para uso diário. Preview ao vivo, explorador de arquivos, palette de comandos e integração com Claude Assist.",
-    "features": {
-      "0": "Preview de markdown ao vivo com split view",
-      "1": "CodeMirror 6 com syntax highlighting",
-      "2": "Explorador de arquivos com árvore de diretórios",
-      "3": "Integração com Claude Assist"
+    "title": "Projetos em desenvolvimento",
+    "markdown-editor": {
+      "name": "Editor de Markdown",
+      "stack": "React • TypeScript • Electron • Vite",
+      "description": "Um editor de markdown pessoal construído para uso diário. Preview ao vivo, explorador de arquivos, palette de comandos e integração com Claude Assist.",
+      "features": {
+        "0": "Preview de markdown ao vivo com split view",
+        "1": "CodeMirror 6 com syntax highlighting",
+        "2": "Explorador de arquivos com árvore de diretórios",
+        "3": "Integração com Claude Assist"
+      }
+    },
+    "db-query-app": {
+      "name": "DB Query App",
+      "stack": "React • TypeScript • Electron • PostgreSQL • SQLite",
+      "description": "Aplicação desktop para editar e executar queries SQL com assistência de IA. Suporta PostgreSQL e SQLite com geração inteligente de queries via prompts em linguagem natural.",
+      "features": {
+        "0": "Geração de queries SQL via IA a partir de prompts",
+        "1": "Editor SQL com syntax highlighting",
+        "2": "Suporte a múltiplos bancos (PostgreSQL/SQLite)",
+        "3": "Visualização de resultados em tabela"
+      }
+    },
+    "focus-guard": {
+      "name": "Focus Guard",
+      "stack": "React • TypeScript • Chrome Extensions API",
+      "description": "Extensão de produtividade para Chrome que ajuda a manter o foco bloqueando sites que roubam sua atenção. Timer Pomodoro integrado e listas de bloqueio customizáveis.",
+      "features": {
+        "0": "Bloqueio de sites que roubam seu foco/atenção",
+        "1": "Timer Pomodoro integrado",
+        "2": "Listas customizáveis de sites bloqueados"
+      }
     },
     "repository": "Repositório",
     "learnMore": "Saiba mais"

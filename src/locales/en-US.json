@@ -15,15 +15,38 @@
     "title": "Tech Stack"
   },
   "projects": {
-    "title": "Featured Project",
-    "projectName": "Markdown Editor",
-    "stack": "React • TypeScript • Electron • Vite",
-    "description": "A personal markdown editor built for daily use. Live preview, file explorer, command palette, and Claude Assist integration.",
-    "features": {
-      "0": "Live markdown preview with split view",
-      "1": "CodeMirror 6 with syntax highlighting",
-      "2": "File explorer with directory tree",
-      "3": "Claude Assist integration"
+    "title": "Projects in development",
+    "markdown-editor": {
+      "name": "Markdown Editor",
+      "stack": "React • TypeScript • Electron • Vite",
+      "description": "A personal markdown editor built for daily use. Live preview, file explorer, command palette, and Claude Assist integration.",
+      "features": {
+        "0": "Live markdown preview with split view",
+        "1": "CodeMirror 6 with syntax highlighting",
+        "2": "File explorer with directory tree",
+        "3": "Claude Assist integration"
+      }
+    },
+    "db-query-app": {
+      "name": "DB Query App",
+      "stack": "React • TypeScript • Electron • PostgreSQL • SQLite",
+      "description": "Desktop application to edit and run SQL queries with AI assistance. Supports PostgreSQL and SQLite with intelligent query generation from natural language prompts.",
+      "features": {
+        "0": "AI-powered SQL query generation from prompts",
+        "1": "SQL editor with syntax highlighting",
+        "2": "Multi-database support (PostgreSQL/SQLite)",
+        "3": "Table view for query results"
+      }
+    },
+    "focus-guard": {
+      "name": "Focus Guard",
+      "stack": "React • TypeScript • Chrome Extensions API",
+      "description": "Productivity Chrome extension that helps maintain focus by blocking attention-stealing websites. Built-in Pomodoro timer and customizable blocking lists.",
+      "features": {
+        "0": "Block websites that steal your focus/attention",
+        "1": "Integrated Pomodoro timer",
+        "2": "Customizable site blocking lists"
+      }
     },
     "repository": "Repository",
     "learnMore": "Learn more"

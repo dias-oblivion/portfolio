@@ -1,15 +1,172 @@
-import { useState, useEffect } from 'react';
-import { Github, Linkedin, Mail, ExternalLink, ArrowRight, Code, Database, BoxesIcon, Cloud, Coffee, Server, Layers, Globe } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Github, Linkedin, Mail, ExternalLink, ArrowRight, Code, Database, BoxesIcon, Cloud, Coffee, Server, Layers, Globe, ChevronLeft, ChevronRight, X, Maximize, Minimize } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import i18n from './i18n';
+import { PROJECTS } from './data/projects';
 import screenshotEditor from './assets/markdown-editor.jpg';
+import screenshotDbQuery from './assets/db-query-app.png';
+import screenshotFocusGuard from './assets/focus-guard.png';
+
+const projectImages: Record<string, string> = {
+  'markdown-editor': screenshotEditor,
+  'db-query-app': screenshotDbQuery,
+  'focus-guard': screenshotFocusGuard
+};
+
+type LightboxImage = { src: string; alt: string };
+
+type LightboxProps = {
+  images: LightboxImage[];
+  initialIndex: number;
+  onClose: () => void;
+};
+
+const ImageLightbox = ({ images, initialIndex, onClose }: LightboxProps) => {
+  const [index, setIndex] = useState(initialIndex);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const prev = () => setIndex((i) => (i - 1 + images.length) % images.length);
+  const next = () => setIndex((i) => (i + 1) % images.length);
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowLeft') { e.stopImmediatePropagation(); prev(); }
+      if (e.key === 'ArrowRight') { e.stopImmediatePropagation(); next(); }
+    };
+    document.addEventListener('keydown', handleKey, true);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', handleKey, true);
+      document.body.style.overflow = '';
+    };
+  }, [onClose]);
+
+  useEffect(() => {
+    const onChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', onChange);
+    return () => document.removeEventListener('fullscreenchange', onChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      containerRef.current?.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
+  const { src, alt } = images[index];
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(6px)' }}
+      onClick={onClose}
+    >
+      {/* Prev button — outside modal */}
+      <button
+        onClick={(e) => { e.stopPropagation(); prev(); }}
+        className="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer mx-4"
+        aria-label="Projeto anterior"
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+
+      {/* Modal container */}
+      <div
+        ref={containerRef}
+        className="relative flex flex-col flex-1 max-w-5xl max-h-[90vh] bg-gray-950 rounded-2xl overflow-hidden shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+        style={{ animation: 'lightbox-in 180ms ease-out' }}
+      >
+        {/* Top bar */}
+        <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
+          <span className="text-sm font-medium text-white/70 truncate">{alt}</span>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <span className="text-xs text-white/40 tabular-nums mr-1">{index + 1} / {images.length}</span>
+            <button
+              onClick={toggleFullscreen}
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              title={isFullscreen ? 'Sair do fullscreen' : 'Fullscreen'}
+            >
+              {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+            </button>
+            <button
+              onClick={onClose}
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              title="Fechar"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Image area */}
+        <div className="flex items-center justify-center p-4 md:p-8 bg-gray-950">
+          <img
+            key={src}
+            src={src}
+            alt={alt}
+            className="max-w-full max-h-[75vh] object-contain rounded-lg select-none"
+            draggable={false}
+            style={{ animation: 'lightbox-in 150ms ease-out' }}
+          />
+        </div>
+
+        {/* Dots */}
+        <div className="flex justify-center gap-1.5 py-3">
+          {images.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              className={`h-1.5 rounded-full transition-all cursor-pointer ${i === index ? 'bg-white w-5' : 'bg-white/30 w-1.5 hover:bg-white/50'}`}
+              aria-label={`Ver imagem ${i + 1}`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Next button — outside modal */}
+      <button
+        onClick={(e) => { e.stopPropagation(); next(); }}
+        className="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer mx-4"
+        aria-label="Próximo projeto"
+      >
+        <ChevronRight className="w-5 h-5" />
+      </button>
+
+      <style>{`
+        @keyframes lightbox-in {
+          from { opacity: 0; transform: scale(0.96) translateY(8px); }
+          to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+      `}</style>
+    </div>
+  );
+};
 
 const Portfolio = () => {
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
+  const [activeProject, setActiveProject] = useState(0);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  const prevProject = () => setActiveProject((p) => (p - 1 + PROJECTS.length) % PROJECTS.length);
+  const nextProject = () => setActiveProject((p) => (p + 1) % PROJECTS.length);
 
   useEffect(() => {
     setIsVisible(true);
+  }, []);
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') setActiveProject((p) => (p - 1 + PROJECTS.length) % PROJECTS.length);
+      if (e.key === 'ArrowRight') setActiveProject((p) => (p + 1) % PROJECTS.length);
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
   }, []);
 
   const scrollToSection = (sectionId: string) => {
@@ -113,73 +270,126 @@ const Portfolio = () => {
 
       {/* Projects Section */}
       <section id="projects" className="py-24 px-6">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold mb-16">{t('projects.title')}</h2>
-          
-          <div className="grid md:grid-cols-2 gap-16 items-start">
-            {/* Project Screenshot */}
-            <div className="relative">
-              <div className="bg-gray-100 rounded-lg overflow-hidden h-80 flex items-center justify-center">
-                <img 
-                  src={screenshotEditor}
-                  alt="Markdown Editor"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23374151%22 width=%22400%22 height=%22300%22/%3E%3C/svg%3E';
-                  }}
-                />
-              </div>
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center justify-between mb-12">
+            <h2 className="text-2xl font-bold">{t('projects.title')}</h2>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={prevProject}
+                className="w-9 h-9 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
+                aria-label="Previous project"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="text-sm text-gray-500 font-medium tabular-nums">
+                {activeProject + 1} / {PROJECTS.length}
+              </span>
+              <button
+                onClick={nextProject}
+                className="w-9 h-9 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
+                aria-label="Next project"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
-            
-            {/* Project Info */}
-            <div>
-              <h3 className="text-2xl font-bold mb-2">{t('projects.projectName')}</h3>
-              <p className="text-sm text-gray-500 font-medium mb-6">{t('projects.stack')}</p>
-              
-              <p className="text-gray-700 mb-8 leading-relaxed">
-                {t('projects.description')}
-              </p>
-              
-              <ul className="space-y-3 mb-8 text-sm text-gray-600">
-                <li className="flex items-start gap-3">
-                  <span className="text-gray-400 mt-1">→</span>
-                  <span>{t('projects.features.0')}</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-gray-400 mt-1">→</span>
-                  <span>{t('projects.features.1')}</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-gray-400 mt-1">→</span>
-                  <span>{t('projects.features.2')}</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-gray-400 mt-1">→</span>
-                  <span>{t('projects.features.3')}</span>
-                </li>
-              </ul>
-              
-              <div className="flex gap-4">
-                <a 
-                  href="https://github.com/dias-oblivion/markdown-editor" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-gray-900 hover:text-gray-600 font-medium cursor-pointer"
-                >
-                  <Github className="w-4 h-4" />
-                  {t('projects.repository')}
-                </a>
-                <a 
-                  href="https://github.com/dias-oblivion/markdown-editor" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-gray-900 hover:text-gray-600 font-medium cursor-pointer"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  {t('projects.learnMore')}
-                </a>
-              </div>
+          </div>
+
+          {/* Carousel */}
+          <div className="relative overflow-hidden">
+            <div
+              className="flex transition-transform duration-500 ease-in-out"
+              style={{ transform: `translateX(-${activeProject * 100}%)` }}
+            >
+              {PROJECTS.map((project) => (
+                <div key={project.id} className="w-full flex-shrink-0">
+                  <div className="grid md:grid-cols-2 gap-12 items-start">
+
+                    {/* Project Screenshot */}
+                    <button
+                      className="group relative bg-gray-900 border border-gray-200 rounded-xl overflow-hidden aspect-video flex items-center justify-center cursor-zoom-in w-full text-left"
+                      onClick={() => setLightboxIndex(PROJECTS.findIndex((p) => p.id === project.id))}
+                      aria-label={`Ver imagem de ${t(`projects.${project.id}.name`)}`}
+                    >
+                      <img
+                        src={projectImages[project.id]}
+                        alt={t(`projects.${project.id}.name`)}
+                        className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                      {/* Hover overlay hint */}
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/20">
+                        <div className="bg-black/60 text-white text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5 backdrop-blur-sm">
+                          <Maximize className="w-3 h-3" />
+                          Ver em detalhes
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* Project Info */}
+                    <div className="py-2">
+                      <h3 className="text-2xl font-bold mb-2">
+                        {t(`projects.${project.id}.name`)}
+                      </h3>
+                      <p className="text-sm text-gray-500 font-medium mb-6">
+                        {t(`projects.${project.id}.stack`)}
+                      </p>
+
+                      <p className="text-gray-700 mb-8 leading-relaxed">
+                        {t(`projects.${project.id}.description`)}
+                      </p>
+
+                      <ul className="space-y-3 mb-8 text-sm text-gray-600">
+                        {Array.from({ length: project.featureCount }, (_, idx) => (
+                          <li key={idx} className="flex items-start gap-3">
+                            <span className="text-gray-400 mt-0.5">→</span>
+                            <span>{t(`projects.${project.id}.features.${idx}`)}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      <div className="flex gap-4">
+                        {project.githubUrl && (
+                          <a
+                            href={project.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-gray-900 hover:text-gray-600 font-medium cursor-pointer"
+                          >
+                            <Github className="w-4 h-4" />
+                            {t('projects.repository')}
+                          </a>
+                        )}
+                        {project.liveUrl && (
+                          <a
+                            href={project.liveUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-gray-900 hover:text-gray-600 font-medium cursor-pointer"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            {t('projects.learnMore')}
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
+          </div>
+
+          {/* Dots indicator */}
+          <div className="flex justify-center gap-2 mt-10">
+            {PROJECTS.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveProject(idx)}
+                className={`w-2 h-2 rounded-full transition-all cursor-pointer ${idx === activeProject ? 'bg-gray-900 w-6' : 'bg-gray-300 hover:bg-gray-400'}`}
+                aria-label={`Go to project ${idx + 1}`}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -243,6 +453,15 @@ const Portfolio = () => {
           <p>{t('footer.copyright')}</p>
         </div>
       </footer>
+
+      {/* Image Lightbox */}
+      {lightboxIndex !== null && (
+        <ImageLightbox
+          images={PROJECTS.map((p) => ({ src: projectImages[p.id], alt: t(`projects.${p.id}.name`) }))}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+        />
+      )}
     </div>
   );
 };
